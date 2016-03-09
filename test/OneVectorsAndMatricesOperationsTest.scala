@@ -4,6 +4,26 @@ import scala.collection.mutable.ListBuffer
 
 class OneVectorsAndMatricesOperationsTest extends PlaySpec {
 
+  /*
+
+
+
+
+
+  Les choix Vector/Array ne sont pas forcèment bons, j'ai juste fait ces choix là au début pour représenter un
+
+  vecteur par vector et une matrix par Array(Array, mais utiliser seulement des arrays et certainement
+
+  plus adéquat
+
+
+
+
+
+
+
+   */
+
   def magnitude(vector: Vector[Double]): Double = vector.foldLeft(0.0)((res, e) => res + Math.pow(e, 2))
 
   def innerProduct(vector1: Vector[Double], vector2: Vector[Double]): Double = {

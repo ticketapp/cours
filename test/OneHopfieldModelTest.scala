@@ -70,10 +70,10 @@ class OneHopfieldModelTest extends PlaySpec {
     breakable {
       for (s <- 0 until sweep) {
         for (i <- 0 until length) {
-          val accumulator = (0 until length).foldLeft(0.0)((res, e) => res + matrix(i)(e) * signal(e))
+          val accumulator = (0 until length).foldLeft(0.0)((res, e) => res + matrix(i)(e)*signal(e))
           resultState(i) = if (accumulator == 0) 0 else 1
 
-          println(s)
+//          println(s)
 
           if (signal == resultState.toVector) {
             Logger.info(s"Retrieve was broken after $s rounds since the signal equals the resultState")
@@ -84,6 +84,32 @@ class OneHopfieldModelTest extends PlaySpec {
     }
 
     resultState.toVector
+  }
+
+  def flipBit(bit: Double): Double = bit match {
+    case 0 => 1
+    case 1 => 0
+    case _ => throw new Exception("FlipBit found a bit that is not 0 or 1")
+  }
+
+  def flipVector(vector: Vector[Double], index: Int, numberOfBits: Int): Vector[Double] = {
+    require(vector.length >= index + numberOfBits)
+
+    val vectorArray = vector.toArray
+
+    for (i <- 0 until numberOfBits) vectorArray(index + i) = flipBit(vectorArray(index + i))
+
+    vectorArray.toVector
+  }
+
+  def giveAllFlippedCombinations(vector: Vector[Double], numberOfBits: Int): Seq[Vector[Double]] = {
+    for (i <- 0 to vector.length-numberOfBits) yield flipVector(vector, i, numberOfBits)
+  }
+
+  def transferFunction(x: Double, lambda: Double) = {
+    require(0 <= lambda && lambda <= 1)
+
+    1/(1 + Math.exp(-lambda * x))
   }
 
   "A discrete Hopfield memory matrix" must {
@@ -147,7 +173,7 @@ class OneHopfieldModelTest extends PlaySpec {
       retrieve(matrix, signal, sweep = 8) mustBe savedState //sweep = 1 is enough here
     }
 
-    "test" in {
+    "1.6.2: test" in {
       val states: Array[Array[Double]] = Array(
         Array(1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0))
 
@@ -161,7 +187,90 @@ class OneHopfieldModelTest extends PlaySpec {
 
       retrieve(matrix = buildMatrix(states), signal = states(0).toVector, sweep = 1) mustBe states(0).toVector
     }
+  }
 
+  "1.6.3 flipVector" must {
 
+    "throw an exception when trying to flip bits out of index" in {
+      val v: Vector[Double] = Vector(1, 0, 1)
+
+      an [Exception] should be thrownBy flipVector(vector = v, index = 1, numberOfBits = 3)
+    }
+
+    "not throw an exception" in {
+      val v: Vector[Double] = Vector(1, 0, 1)
+
+      flipVector(vector = v, index = 1, numberOfBits = 2)
+    }
+  }
+
+  "1.6.3 A vector" must {
+    "have 1 bit flipped" in {
+      val v: Vector[Double] = Vector(1, 0, 1, 0)
+
+      val expectedVector: Vector[Double] = Vector(1, 0, 0, 0)
+
+      flipVector(vector = v, index = 2, numberOfBits = 1) mustBe expectedVector
+    }
+
+    "have 3 bit flipped" in {
+      val v: Vector[Double] = Vector(1, 0, 1, 0, 1, 0, 1, 0)
+
+      val expectedVector: Vector[Double] = Vector(1, 1, 0, 1, 1, 0, 1, 0)
+
+      flipVector(vector = v, index = 1, numberOfBits = 3) mustBe expectedVector
+    }
+  }
+
+  "1.6.3 All combinations of flipped vectors" must {
+
+    "be given" in {
+      val v: Vector[Double] = Vector(1, 0, 1, 0, 1, 0)
+
+      val expectedCombinations: Seq[Vector[Double]] = Seq(
+        Vector(0, 1, 1, 0, 1, 0),
+        Vector(1, 1, 0, 0, 1, 0),
+        Vector(1, 0, 0, 1, 1, 0),
+        Vector(1, 0, 1, 1, 0, 0),
+        Vector(1, 0, 1, 0, 0, 1))
+
+      giveAllFlippedCombinations(vector = v, numberOfBits = 2) mustBe expectedCombinations
+    }
+  }
+
+  "1.6.3 retrieve" must {
+
+    "retrieve signals with one flipped bit" in {
+      val state: Vector[Double] = Vector(0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0)
+      val matrix = buildMatrix(Array(state.toArray))
+
+      val oneBitFlippedVectors = giveAllFlippedCombinations(vector = state, numberOfBits = 1)
+
+      for (oneBitFlippedVector <- oneBitFlippedVectors) {
+        if (retrieve(matrix = matrix, signal = oneBitFlippedVector, sweep = 1) != state)
+          Logger.info("Rappel de l'état :\n" + state + "\nVecteur incriminé :\n" + oneBitFlippedVector)
+      }
+    }
+
+    "retrieve signals with two flipped bit" in {
+      val state: Vector[Double] = Vector(0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0)
+      val matrix = buildMatrix(Array(state.toArray))
+
+      val oneBitFlippedVectors = giveAllFlippedCombinations(vector = state, numberOfBits = 1)
+
+      for (oneBitFlippedVector <- oneBitFlippedVectors) {
+        if (retrieve(matrix = matrix, signal = oneBitFlippedVector, sweep = 1) != state)
+          Logger.info("Rappel de l'état :\n" + state + "\nVecteur incriminé :\n" + oneBitFlippedVector)
+      }
+    }
+  }
+
+  "1.6.4 retrieve" must {
+
+    //  "1.6.4.0 done before" in { }
+
+    "1.6.4.1 transfer function (coder la fonction de transfert f(x) et l!expérimenter avec différentes valeurs de lambda)" in {
+
+    }
   }
 }
